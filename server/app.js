@@ -5,6 +5,7 @@ const partials = require('express-partials');
 const bodyParser = require('body-parser');
 const Auth = require('./middleware/auth');
 const models = require('./models');
+const cookieParser = require('./middleware/cookieParser');
 
 const app = express();
 
@@ -14,8 +15,8 @@ app.use(partials());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
-
-
+app.use(cookieParser);
+app.use(Auth.createSession);
 
 app.get('/',
   (req, res) => {
@@ -91,7 +92,7 @@ app.post('/signup', (req, res, next) => {
       }
     })
     .then(newUser => {
-      return models.Sessions.update({hash: req.session.hash}, {userId: newUser.insertId}); // update({options}, {values})
+      return models.Sessions.update({hash: req.session.hash}, {userId: newUser.insertId});
     })
     .then(() => {
       res.status(201).redirect('/');
@@ -100,6 +101,7 @@ app.post('/signup', (req, res, next) => {
       res.status(500).send(error);
     })
     .catch(() => {
+      console.log('signup catch');
       res.redirect('/');
     });
 });

@@ -13,6 +13,7 @@ const parseCookies = (req, res, next) => {
   // assign cookiesObj to cookies property on the request
   req.cookies = cookiesObj;
   next();
+  return;
 };
 
 module.exports = parseCookies;
